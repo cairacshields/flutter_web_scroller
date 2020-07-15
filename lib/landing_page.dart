@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_scrollbar/flutter_web_scrollbar.dart';
 
 class LandingPage extends StatefulWidget {
   LandingPage({Key key}) : super(key: key);
@@ -10,12 +11,19 @@ class LandingPage extends StatefulWidget {
 
 class _LandingPageState extends State<LandingPage> {
   ScrollController _controller;
-  double _offset = 0;
 
   @override
   void initState() {
+    //Initialize the  scrollController
     _controller = ScrollController();
     super.initState();
+  }
+
+  void scrollCallBack(DragUpdateDetails dragUpdate) {
+    setState(() {
+      // Note: 3.5 represents the theoretical height of all my scrollable content. This number will vary for you.
+      _controller.position.moveTo(dragUpdate.globalPosition.dy * 3.5);
+    });
   }
 
   @override
@@ -27,6 +35,7 @@ class _LandingPageState extends State<LandingPage> {
         children: [
           Container(
             child: SingleChildScrollView(
+              //Assign the controller to my scrollable widget
               controller: _controller,
               child: Column(
                 children: [
@@ -54,37 +63,19 @@ class _LandingPageState extends State<LandingPage> {
               ),
             ),
           ),
-          //Scroll bar
-          Container(
-              alignment: Alignment.centerRight,
-              height: MediaQuery.of(context).size.height,
-              width: 20.0,
-              margin: EdgeInsets.only(left: MediaQuery.of(context).size.width - 20.0),
-              decoration: BoxDecoration(color: Colors.black12),
-              child: Container(
-                alignment: Alignment.topCenter,
-                  child: GestureDetector(
-                      child: Container(
-                      height: 40.0,
-                      width: 15.0,
-                      margin:
-                          EdgeInsets.only(left: 5.0, right: 5.0, top: _offset),
-                      decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.all(Radius.circular(3.0))),
-                    ),
-                      onVerticalDragUpdate: (dragUpdate) {
-                        _controller.position.moveTo(dragUpdate.globalPosition.dy * 3.5);
 
-                        setState(() {
-                           if(dragUpdate.globalPosition.dy >= 0) {
-                             _offset = dragUpdate.globalPosition.dy;
-                           }
-                          print("View offset ${_controller.offset} scroll-bar offset ${_offset}");
-                        });
-                      },
-                ),
-              )
+
+          FlutterWebScroller(
+            //Pass a reference to the ScrollCallBack function into the scrollbar
+            scrollCallBack,
+
+            //Add optional values
+            scrollBarBackgroundColor: Colors.white,
+            scrollBarWidth: 20.0,
+            dragHandleColor: Colors.red,
+            dragHandleBorderRadius: 2.0,
+            dragHandleHeight: 40.0,
+            dragHandleWidth: 15.0,
           ),
         ],
       ),
